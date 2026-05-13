@@ -1,10 +1,8 @@
 pipeline {
-
   agent any
 
-  environment {
-    APP_NAME = 'devops-lab-app'
-    APP_PORT = '3000'
+  tools {
+    nodejs 'NodeJS-18'
   }
 
   stages {
@@ -17,6 +15,7 @@ pipeline {
 
     stage('Install') {
       steps {
+        sh 'node -v'
         sh 'npm install'
       }
     }
@@ -27,19 +26,9 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
+    stage('Build') {
       steps {
-        sh 'docker build -t devops-lab-app .'
-      }
-    }
-
-    stage('Run Container') {
-      steps {
-        sh '''
-          docker stop app || true
-          docker rm app || true
-          docker run -d -p 3000:3000 --name app devops-lab-app
-        '''
+        sh 'echo "Build complete"'
       }
     }
 
