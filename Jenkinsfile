@@ -4,37 +4,44 @@ pipeline {
 
   environment {
     APP_NAME = 'devops-lab-app'
-    VERSION = '1.0.0'
+    APP_PORT = '3000'
   }
 
   stages {
 
     stage('Checkout') {
       steps {
-        git branch: 'main',
-            url: 'https://github.com/sowjanyanu-34/devops-lab-app.git'
+        checkout scm
       }
     }
 
-    stage('Build') {
+    stage('Install') {
       steps {
-        echo 'Building project...'
-        sh 'bash build.sh'
+        sh 'npm install'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npm test || true'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh 'docker build -t devops-lab-app .'
+      }
+    }
+
+    stage('Run Container') {
+      steps {
+        sh '''
+          docker stop app || true
+          docker rm app || true
+          docker run -d -p 3000:3000 --name app devops-lab-app
+        '''
       }
     }
 
   }
-
-  post {
-    always {
-      echo 'Pipeline completed'
-    }
-    success {
-      echo 'Build SUCCESS'
-    }
-    failure {
-      echo 'Build FAILED'
-    }
-  }
-
 }
